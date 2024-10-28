@@ -1,0 +1,55 @@
+import { test, expect } from '@playwright/test';
+import exp from 'constants';
+import { LoginPage } from './pageobjects/LoginPage';
+
+test('test', async ({ page }) => {
+  await page.goto('https://www.saucedemo.com/');  
+ /* await page.getByRole('textbox', {name: 'Username'}).fill('standard_user') 
+  await page.getByRole('textbox', {name: 'Password'}).fill('secret_sauce')
+  await page.getByRole('button', {name: 'Login'}).click()*/
+
+  const loginPage = new LoginPage(page)
+  await loginPage.fillUsrname('standard_user')
+  await loginPage.fillPassword('secret_sauce')
+  await loginPage.clickOnLogin()
+
+  const itemsContainer = await page.locator('#inventory_container .inventory_item').all()
+
+  const randomIndex = Math.floor(Math.random()* itemsContainer.length)
+
+  const randomItem = itemsContainer[randomIndex]
+
+  const expectedName = await randomItem.locator('.inventory_item_name').innerText()
+  const expectedDescription = await randomItem.locator('.inventory_item_desc').innerText()
+  const expectedPrice = await randomItem.locator('.inventory_item_price').innerText()
+
+  console.log(`Name: ${expectedName} \nDescription: ${expectedDescription} \nPrice: ${expectedPrice}`)
+
+  await randomItem.getByRole('button', {name: 'Add to cart'}).click()
+
+  await page.locator('a.shopping_cart_link').click()
+
+  //await page.pause()
+
+  expect(page.getByRole('button', {name: 'Checkout'})).toBeVisible()
+
+  const currentedName = await page.locator('.inventory_item_name').innerText()
+  const currentDescription = await page.locator('.inventory_item_desc').innerText()
+  const currentPrice = await page.locator('.inventory_item_price').innerText()
+
+
+  expect(currentedName).toEqual(expectedName)
+  expect(currentDescription).toEqual(expectedDescription)
+  expect(currentPrice).toEqual(expectedPrice)
+
+  await page.getByRole('button', {name: 'Checkout'}).click()
+  await page.getByRole('textbox', {name: 'First Name'}).fill('Demetrio') 
+  await page.getByRole('textbox', {name: 'Last Name'}).fill('Romero')
+  await page.getByRole('textbox', {name: 'Zip/Postal Code'}).fill('055428') 
+  await page.getByRole('button', {name: 'Continue'}).click()
+  await page.getByRole('button', {name: 'Finish'}).click()
+
+  await expect(page.getByRole('heading', {name: 'Thank you for your order!'})).toBeVisible()
+
+
+});

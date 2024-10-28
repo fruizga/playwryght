@@ -1,0 +1,37 @@
+import { Locator, Page } from "@playwright/test"
+
+export class LoginPage {
+    private readonly userNameTextbox: Locator
+    private readonly passwordTextbox: Locator
+    private readonly loginButton: Locator
+
+    constructor(page: Page) {//localización de los elementos ene l constructor
+        this.userNameTextbox = page.getByRole('textbox', { name: 'Username' })
+
+        this.passwordTextbox = page.getByRole('textbox', { name: 'Password' })
+
+        this.loginButton = page.getByRole('button', { name: 'Login' })
+
+    }
+
+//crear interacciones
+async fillUsrname(username:string){
+    await this.userNameTextbox.fill(username)
+}
+
+async fillPassword(password:string){
+    await this.passwordTextbox.fill(password)
+}
+
+async clickOnLogin(){
+    await this.loginButton.click()
+}
+
+//Hacer todo el proceso de login com una tarea (método)
+/*async loginWthCredentias(username:string, password:string){
+    await this.userNameTextbox.fill(username)
+    await this.passwordTextbox.fill(password)
+    await this.loginButton.click()
+}*/
+
+}
